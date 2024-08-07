@@ -9,28 +9,27 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {  
+class _MainScreenState extends State<MainScreen> {
   List<String> todoList = [];
-  
+
   void addTodo({required var todoText}) {
     if (todoList.contains(todoText)) {
       showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Already exists"),
-            content: const Text("this task is already exists"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("close"),
-              )
-            ],
-          );
-        }
-      );
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Already exists"),
+              content: const Text("this task is already exists"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("close"),
+                )
+              ],
+            );
+          });
       return;
     }
     setState(() {
@@ -40,12 +39,12 @@ class _MainScreenState extends State<MainScreen> {
     Navigator.pop(context);
   }
 
-  void writeLocalData() async{
+  void writeLocalData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('todoList', todoList);
   }
 
-  void loadData() async{
+  void loadData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     todoList = (prefs.getStringList('todoList') ?? []).toList();
     setState(() {
@@ -68,57 +67,58 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text("TODO App"),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context, 
-                builder: (context) {
-                  return Padding(
-                    padding: MediaQuery.of(context).viewInsets,
-                    child: Container(
-                      height: 250,
-                      child: AddTask(
-                        addTodo: addTodo,
-                      ),
-                    ),
-                  );
-                }
-              );
-            }, 
-            icon: const Icon(Icons.add),
-          )
-        ],
       ),
       body: ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            onTap: (){
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          todoList.removeAt(index);
-                        });
-                        writeLocalData();
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Task done!"),
-                    ),
-                  );
-                },
+          itemCount: todoList.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            todoList.removeAt(index);
+                          });
+                          writeLocalData();
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Task done!"),
+                      ),
+                    );
+                  },
+                );
+              },
+              title: Text(todoList[index]),
+            );
+          }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: MediaQuery.of(context).viewInsets,
+                child: Container(
+                  height: 250,
+                  child: AddTask(
+                    addTodo: addTodo,
+                  ),
+                ),
               );
-            },
-            title: Text(todoList[index]),
+            }
           );
-        }
-      )
+        },
+        backgroundColor: Colors.black,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
