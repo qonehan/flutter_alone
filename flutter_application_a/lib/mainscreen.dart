@@ -8,7 +8,16 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> {  
+  List<String> todoList = [];
+
+  void addTodo({required var todoText}) {
+    setState(() {
+      todoList.insert(0, todoText);
+    });
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +37,9 @@ class _MainScreenState extends State<MainScreen> {
                     padding: MediaQuery.of(context).viewInsets,
                     child: Container(
                       height: 250,
-                      child: AddTask(),
+                      child: AddTask(
+                        addTodo: addTodo,
+                      ),
                     ),
                   );
                 }
@@ -38,6 +49,34 @@ class _MainScreenState extends State<MainScreen> {
           )
         ],
       ),
+      body: ListView.builder(
+        itemCount: todoList.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            onTap: (){
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          todoList.removeAt(index);
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Text("Task done!"),
+                    ),
+                  );
+                },
+              );
+            },
+            title: Text(todoList[index]),
+          );
+        }
+      )
     );
   }
 }
