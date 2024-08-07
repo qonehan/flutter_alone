@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_a/add_task.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -10,12 +11,52 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {  
   List<String> todoList = [];
-
+  
   void addTodo({required var todoText}) {
+    if (todoList.contains(todoText)) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Already exists"),
+            content: const Text("this task is already exists"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("close"),
+              )
+            ],
+          );
+        }
+      );
+      return;
+    }
     setState(() {
       todoList.insert(0, todoText);
     });
+    writeLocalData();
     Navigator.pop(context);
+  }
+
+  void writeLocalData() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('todoList', todoList);
+  }
+
+  void loadData() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    todoList = (prefs.getStringList('todoList') ?? []).toList();
+    setState(() {
+      todoList = (prefs.getStringList('todoList') ?? []).toList();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
   }
 
   @override
@@ -65,9 +106,10 @@ class _MainScreenState extends State<MainScreen> {
                         setState(() {
                           todoList.removeAt(index);
                         });
+                        writeLocalData();
                         Navigator.pop(context);
                       },
-                      child: Text("Task done!"),
+                      child: const Text("Task done!"),
                     ),
                   );
                 },

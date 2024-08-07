@@ -19,6 +19,7 @@ class _AddTaskState extends State<AddTask> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: TextField(
+            autofocus: true,
             controller: todoText,
             decoration: InputDecoration(
               hintText: "Add task"
@@ -29,8 +30,9 @@ class _AddTaskState extends State<AddTask> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             onPressed: () {
-              print(todoText.text);
-              widget.addTodo(todoText: todoText.text);
+              if(todoText.text.isNotEmpty) {
+                widget.addTodo(todoText: todoText.text);
+              }
               todoText.clear;
             },
             child: const Text("Add")
